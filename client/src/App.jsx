@@ -20,13 +20,17 @@ function SidebarItem({ item, onRemove }) {
     <div
       ref={setNodeRef}
       style={style}
-      className="flex items-center gap-2 border border-[var(--border)] p-2"
+      className="group flex items-center gap-2 border border-[var(--border)] p-2"
       {...attributes}
     >
       <span className="text-sm text-[var(--text-muted)] cursor-grab select-none" {...listeners}>⠿</span>
       <img src={item.preview} alt={item.name} className="w-12 h-12 object-cover flex-shrink-0" draggable="false" />
       <span className="text-xs truncate flex-1">{item.name}</span>
-      <button onPointerDown={(e) => e.stopPropagation()} onClick={() => onRemove(item.id)} className="px-1.5 py-0.5 text-xs border border-[var(--border)] hover:bg-[var(--bg-inset)]">✕</button>
+      <button
+        onPointerDown={(e) => e.stopPropagation()}
+        onClick={() => onRemove(item.id)}
+        className="px-1.5 py-0.5 text-xs border border-[var(--border)] hover:bg-[var(--bg-inset)] opacity-0 group-hover:opacity-100 transition-opacity"
+      >✕</button>
     </div>
   );
 }
@@ -141,8 +145,12 @@ export default function App() {
           {/* Image list sidebar */}
           {images.length > 0 && (
             <div className="flex-1 min-h-0">
-              <div className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-muted)] bg-[var(--bg-inset)] border-b border-[var(--border)]">
-                Images ({images.length})
+              <div className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-muted)] bg-[var(--bg-inset)] border-b border-[var(--border)] flex justify-between items-center">
+                <span>Images ({images.length})</span>
+                <button
+                  onClick={() => setImages([])}
+                  className="px-1.5 py-0.5 text-[10px] border border-[var(--border)] hover:bg-[var(--bg2)]"
+                >Clear</button>
               </div>
               <div className="p-2 overflow-y-auto">
                 <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
