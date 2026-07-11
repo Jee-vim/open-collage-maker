@@ -13,6 +13,30 @@ import { DEFAULT_SETTINGS, slotsFor, PRESETS } from './utils/constants.js';
 let idSeq = 0;
 const nextId = () => `img_${Date.now()}_${idSeq++}`;
 
+const MAX_CELL = 2400;
+async function imageSize(file) {
+  try {
+    const bmp = await createImageBitmap(file);
+    const { width, height } = bmp;
+    bmp.close?.();
+    const longest = Math.max(width, height);
+    if (longest > MAX_CELL) {
+      const k = MAX_CELL / longest;
+      return { w: Math.round(width * k), h: Math.round(height * k) };
+    }
+    return { w: width, h: height };
+  } catch {
+    return { w: 200, h: 200 };
+  }
+}
+
+// Fixed SQUARE cell size applied to every photo, so all cells are identical
+// and each is cover-cropped to fill (no blanks, tidy, sharp).
+const CELL_SIZE = 1080;
+function uniformCell() {
+  return { w: CELL_SIZE, h: CELL_SIZE };
+}
+
 function SidebarItem({ item, onRemove }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: item.id });
   const style = { transform: CSS.Transform.toString(transform), transition };
@@ -46,31 +70,36 @@ export default function App() {
   const removeAt = useCallback((index) => {
     setImages((prev) => prev.filter((_, i) => i !== index));
   }, []);
-  const addImages = useCallback((files) => {
+  const addImages = useCallback(async (files) => {
     if (!slots) return;
+    const room = Math.max(0, slots - images.length);
+    const accepted = files.slice(0, room);
+    if (files.length > room) notify(`Layout holds ${slots} images`);
+    const items = await Promise.all(accepted.map(async (f) => ({
+      id: nextId(), file: f, name: f.name,
+      preview: URL.createObjectURL(f),
+      size: await imageSize(f),
+    })));
     setImages((prev) => {
-      const room = Math.max(0, slots - prev.length);
-      const accepted = files.slice(0, room);
-      if (files.length > room) notify(`Layout holds ${slots} images`);
-      const items = accepted.map((f) => ({
-        id: nextId(), file: f, name: f.name,
-        preview: URL.createObjectURL(f), size: { w: 200, h: 200 },
-      }));
-      return [...prev, ...items];
+      const merged = [...prev, ...items].slice(0, slots);
+      const cell = uniformCell(merged);
+      return merged.map((it) => ({ ...it, size: cell }));
     });
   }, [slots]);
 
-  const addAt = useCallback((index, files) => {
+  const addAt = useCallback(async (index, files) => {
     if (!slots) return;
+    const accepted = files.slice(0, slots - index);
+    const items = await Promise.all(accepted.map(async (f) => ({
+      id: nextId(), file: f, name: f.name,
+      preview: URL.createObjectURL(f),
+      size: await imageSize(f),
+    })));
     setImages((prev) => {
       const next = [...prev];
-      files.slice(0, slots - index).forEach((f, k) => {
-        next[index + k] = {
-          id: nextId(), file: f, name: f.name,
-          preview: URL.createObjectURL(f), size: { w: 200, h: 200 },
-        };
-      });
-      return next;
+      items.forEach((it, k) => { next[index + k] = it; });
+      const cell = uniformCell(next);
+      return next.map((it) => ({ ...it, size: cell }));
     });
   }, [slots]);
 
@@ -151,6 +180,7 @@ export default function App() {
                 layout={settings.layout}
                 background={settings.background}
                 slots={slots}
+                cellSize={images.length ? uniformCell(images) : { w: 600, h: 600 }}
                 onAddSlot={addAt}
                 onRemoveSlot={removeAt}
               />

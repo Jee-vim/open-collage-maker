@@ -94,14 +94,14 @@ function Layout({ cells, layout, background, total, onAdd, onRemove }) {
   );
 }
 
-export default function ImageList({ items, layout, background, slots, onAddSlot, onRemoveSlot }) {
+export default function ImageList({ items, layout, background, slots, cellSize, onAddSlot, onRemoveSlot }) {
   const wrapRef = useRef(null);
   const fileRef = useRef(null);
   const [pending, setPending] = useState(null);
   const [scale, setScale] = useState(1);
 
   const cells = Array.from({ length: slots }, (_, i) =>
-    items[i] || { id: `slot_${i}`, placeholder: true, index: i, size: { w: 200, h: 200 } }
+    items[i] || { id: `slot_${i}`, placeholder: true, index: i, size: cellSize }
   );
 
   const total = layout === 'contact-sheet' ? { width: 0, height: 0 } : totals(cells, layout);
