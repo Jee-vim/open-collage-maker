@@ -1,4 +1,3 @@
-import { ui } from '../styles/ui.js';
 import { PRESETS } from '../utils/constants.js';
 
 function LayoutIcon({ preset }) {
@@ -69,13 +68,13 @@ export default function SettingsPanel({ settings, onChange, onPreset, presetValu
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-2">
-        <span className={ui.sectionLabel}>Layout</span>
+        <span className="section-label">Layout</span>
         <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
           {PRESETS.map((p) => (
             <button
               key={p.value}
               onClick={() => onPreset(p.value)}
-              className={`flex-shrink-0 w-24 h-20 bg-bg-2 ${ui.tile} ${presetValue === p.value ? ui.tileActive : ''}`}
+              className={`tile flex-shrink-0 w-24 h-20 bg-bg-2 ${presetValue === p.value ? 'tile-active' : ''}`}
               title={p.label}
             >
               <LayoutIcon preset={p.value} />
@@ -85,7 +84,7 @@ export default function SettingsPanel({ settings, onChange, onPreset, presetValu
       </div>
 
       <div className="flex flex-col gap-2">
-        <span className={ui.sectionLabel}>Background</span>
+        <span className="section-label">Background</span>
         <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
           {COLORS.map((c) => (
             <button

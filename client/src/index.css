@@ -24,3 +24,31 @@ input, select, button { font: inherit; }
 
 .hide-scrollbar::-webkit-scrollbar { display: none; }
 .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* App layout */
+.sidebar { @apply w-80 flex-shrink-0 border-r border-border flex flex-col overflow-y-auto; }
+.main { @apply flex-1 min-w-0 flex items-center justify-center p-8 overflow-auto; }
+
+/* Sections */
+.section { @apply p-4 border-b border-border; }
+.section-label { @apply text-xs text-fg-dim; }
+
+/* Buttons */
+.btn { @apply h-8 px-4 text-sm font-medium; }
+.btn-primary { @apply bg-accent text-accent-fg hover:opacity-90 disabled:opacity-30; }
+.btn-ghost { @apply text-fg-dim hover:text-fg; }
+
+/* Form */
+.dropzone { @apply border border-dashed cursor-pointer text-center py-6 text-sm text-fg-dim hover:bg-bg-2; }
+
+/* List */
+.list-item { @apply flex items-center gap-3 p-2 hover:bg-bg-2; }
+.list-item-remove { @apply text-fg-dim hover:text-fg opacity-0 group-hover:opacity-100 transition-opacity; }
+
+/* Cards / Tiles */
+.tile { @apply overflow-hidden hover:bg-border; }
+.tile-active { @apply border; }
+
+/* Image */
+.thumb { @apply w-10 h-10 object-cover flex-shrink-0; }
+.preview-img { @apply object-cover border border-border; }

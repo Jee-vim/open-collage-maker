@@ -2,7 +2,6 @@ import { useState, useCallback } from 'react';
 import { DndContext, closestCenter } from '@dnd-kit/core';
 import { SortableContext, arrayMove, useSortable, rectSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { ui } from './styles/ui.js';
 import Header from './components/Header.jsx';
 import Dropzone from './components/Dropzone.jsx';
 import ImageList from './components/ImageList.jsx';
@@ -18,11 +17,11 @@ function SidebarItem({ item, onRemove }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: item.id });
   const style = { transform: CSS.Transform.toString(transform), transition };
   return (
-    <div ref={setNodeRef} style={style} className={ui.listItem} {...attributes}>
+    <div ref={setNodeRef} style={style} className="!px-4 list-item group" {...attributes}>
       <span className="text-fg-dim cursor-grab select-none" {...listeners}>⠿</span>
-      <img src={item.preview} alt={item.name} className={ui.thumb} draggable="false" />
+      <img src={item.preview} alt={item.name} className="thumb" draggable="false" />
       <span className="text-sm truncate flex-1">{item.name}</span>
-      <button onPointerDown={(e) => e.stopPropagation()} onClick={() => onRemove(item.id)} className={ui.listItemRemove}>✕</button>
+      <button onPointerDown={(e) => e.stopPropagation()} onClick={() => onRemove(item.id)} className="list-item-remove">✕</button>
     </div>
   );
 }
@@ -107,16 +106,16 @@ export default function App() {
       <Toast toast={toast} />
 
       <div className="flex flex-1 min-h-0">
-        <aside className={ui.sidebar}>
-          <div className={ui.section}><Dropzone onAdd={addImages} /></div>
-          <div className={ui.section}><SettingsPanel settings={settings} onChange={setSettings} onPreset={applyPreset} presetValue={preset} /></div>
+        <aside className="sidebar">
+          <div className="section"><Dropzone onAdd={addImages} /></div>
+          <div className="section"><SettingsPanel settings={settings} onChange={setSettings} onPreset={applyPreset} presetValue={preset} /></div>
           {images.length > 0 && (
             <div className="flex-1 min-h-0">
-              <div className={`p-4 flex justify-between items-center`}>
-                <span className={ui.sectionLabel}>{images.length} Images</span>
-                <button onClick={() => setImages([])} className={ui.btnGhost}>Clear</button>
+              <div className="section flex justify-between items-center">
+                <span className="section-label"> Images ({images.length})</span>
+                <button onClick={() => setImages([])} className="btn-ghost text-sm">Clear</button>
               </div>
-              <div className="px-2 overflow-y-auto">
+              <div className="overflow-y-auto">
                 <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                   <SortableContext items={images.map((i) => i.id)} strategy={rectSortingStrategy}>
                     <div className="divide-y divide-border">
@@ -129,7 +128,7 @@ export default function App() {
           )}
         </aside>
 
-        <main className={ui.main}>
+        <main className="main">
           {images.length > 0 ? (
             <ImageList items={images} layout={settings.layout} background={settings.background} />
           ) : (
