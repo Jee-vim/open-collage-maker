@@ -13,7 +13,7 @@ export default function Dropzone({ onAdd }) {
   });
 
   return (
-    <div {...getRootProps()} className={`dropzone ${isDragActive ? 'bg-bg-2 border-fg' : 'border-border'}`}>
+    <div {...getRootProps()} className={`dropzone ${isDragActive ? 'bg-bg-2 border-fg' : ''}`}>
       <input {...getInputProps()} />
       {isDragActive ? 'Drop here' : 'Drop images or click to upload'}
     </div>

@@ -90,7 +90,7 @@ export default function SettingsPanel({ settings, onChange, onPreset, presetValu
             <button
               key={c.value}
               onClick={() => set('background', c.value)}
-              className={`flex-shrink-0 w-8 h-8 border hover:border-fg ${settings.background === c.value ? 'border-fg' : 'border-border'}`}
+              className={`flex-shrink-0 w-8 h-8 border hover:border-fg ${settings.background === c.value ? 'border-fg' : ''}`}
               style={{ background: c.value }}
               title={c.label}
             />
