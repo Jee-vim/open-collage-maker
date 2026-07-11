@@ -1,14 +1,12 @@
-// Top header with title and theme toggle.
 export default function Header({ theme, onToggle }) {
   return (
-    <header className="flex items-center justify-between w-full max-w-5xl mx-auto px-4 py-6">
-      <h1 className="text-2xl font-bold text-center flex-1">Photo Collage Maker</h1>
+    <header className="flex items-center justify-between px-3 py-2 border-b border-[var(--border)] bg-[var(--bg-inset)]">
+      <h1 className="text-xs font-bold uppercase tracking-widest">Collage Maker</h1>
       <button
         onClick={onToggle}
-        className="px-3 py-1 rounded-md border border-slate-300 dark:border-slate-600"
-        aria-label="toggle theme"
+        className="px-2 py-0.5 text-[11px] border border-[var(--border)] hover:bg-[var(--border)]"
       >
-        {theme === 'dark' ? 'Light' : 'Dark'}
+        {theme === 'dark' ? 'LT' : 'DK'}
       </button>
     </header>
   );

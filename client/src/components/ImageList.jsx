@@ -80,32 +80,33 @@ function Thumb({ item, onRemove }) {
     <div
       ref={setNodeRef}
       style={{ ...style, width: size.w, height: size.h }}
-      className="relative flex-shrink-0 rounded outline-none"
+      className="relative flex-shrink-0 outline-none border border-[var(--border)]"
     >
-      <img src={item.preview} alt={item.name} className="w-full h-full object-cover rounded" />
-      <button {...attributes} {...listeners} className="absolute top-0 left-0 px-1 text-xs bg-slate-900/70 text-white rounded cursor-grab" title="Drag to reorder">⠿</button>
-      <button onClick={() => onRemove(item.id)} className="absolute top-0 right-0 px-1 text-xs bg-slate-900/70 text-white rounded">✕</button>
+      <img src={item.preview} alt={item.name} className="w-full h-full object-cover" />
+      <button {...attributes} {...listeners} className="absolute top-0 left-0 px-1 text-[10px] bg-[var(--bg)]/80 border-r border-b border-[var(--border)] cursor-grab" title="Drag to reorder">⠿</button>
+      <button onClick={() => onRemove(item.id)} className="absolute top-0 right-0 px-1 text-[10px] bg-[var(--bg)]/80 border-l border-b border-[var(--border)]">✕</button>
     </div>
   );
 }
 
 function Layout({ items, layout, background, onRemove, total }) {
-  const row = 'flex flex-row items-start';
-  const col = 'flex flex-col items-start';
-  const box = { background, gap: `${GAP}px`, padding: `${OUTER_PADDING}px`, width: total.width || '100%', height: total.height || 'auto' };
+  const gap = { gap: `${GAP}px` };
+  const row = { ...gap, display: 'flex', flexDirection: 'row', alignItems: 'flex-start' };
+  const col = { ...gap, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' };
+  const box = { background, padding: `${OUTER_PADDING}px`, width: total.width || '100%', height: total.height || 'auto' };
 
   if (layout === 'horizontal') {
-    return <div style={box} className={row}>{items.map((it) => <Thumb key={it.id} item={it} onRemove={onRemove} />)}</div>;
+    return <div style={{ ...box, ...row }}>{items.map((it) => <Thumb key={it.id} item={it} onRemove={onRemove} />)}</div>;
   }
   if (layout === 'vertical') {
-    return <div style={box} className={col}>{items.map((it) => <Thumb key={it.id} item={it} onRemove={onRemove} />)}</div>;
+    return <div style={{ ...box, ...col }}>{items.map((it) => <Thumb key={it.id} item={it} onRemove={onRemove} />)}</div>;
   }
   if (layout === 'masonry') {
     const cols = masonryColumns(items, gridCols(items.length));
     return (
-      <div style={box} className={row}>
+      <div style={{ ...box, ...row }}>
         {cols.map((c, i) => (
-          <div key={i} className={col}>{c.map((it) => <Thumb key={it.id} item={it} onRemove={onRemove} />)}</div>
+          <div key={i} style={col}>{c.map((it) => <Thumb key={it.id} item={it} onRemove={onRemove} />)}</div>
         ))}
       </div>
     );
@@ -114,9 +115,9 @@ function Layout({ items, layout, background, onRemove, total }) {
     return (
       <div style={{ ...box, display: 'grid', gridTemplateColumns: 'repeat(auto-fill, 120px)' }}>
         {items.map((it) => (
-          <div key={it.id} style={{ width: 120, height: 120 }} className="relative flex-shrink-0">
-            <img src={it.preview} alt={it.name} className="w-full h-full object-cover rounded" />
-            <button onClick={() => onRemove(it.id)} className="absolute top-0 right-0 px-1 text-xs bg-slate-900/70 text-white rounded">✕</button>
+          <div key={it.id} style={{ width: 120, height: 120 }} className="relative flex-shrink-0 border border-[var(--border)]">
+            <img src={it.preview} alt={it.name} className="w-full h-full object-cover" />
+            <button onClick={() => onRemove(it.id)} className="absolute top-0 right-0 px-1 text-[10px] bg-[var(--bg)]/80 border-l border-b border-[var(--border)]">✕</button>
           </div>
         ))}
       </div>
@@ -126,9 +127,9 @@ function Layout({ items, layout, background, onRemove, total }) {
   const ss = stretchedSizes(items);
   const rows = chunkRows(items, gridCols(items.length));
   return (
-    <div style={box} className={col}>
+    <div style={{ ...box, ...col }}>
       {rows.map((r, i) => (
-        <div key={i} className={row}>
+        <div key={i} style={row}>
           {r.map((it) => <Thumb key={it.id} item={{ ...it, size: ss[items.indexOf(it)] }} onRemove={onRemove} />)}
         </div>
       ))}
