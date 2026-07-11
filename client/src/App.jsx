@@ -29,10 +29,10 @@ function SidebarItem({ item, onRemove }) {
 
 export default function App() {
   const [images, setImages] = useState([]);
-  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
+  const [settings, setSettings] = useState({ ...DEFAULT_SETTINGS, ...PRESETS[0].opts });
   const [progress, setProgress] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [preset, setPreset] = useState('');
+  const [preset, setPreset] = useState(PRESETS[0].value);
   const [toast, setToast] = useState(null);
 
   const slots = slotsFor(preset);
