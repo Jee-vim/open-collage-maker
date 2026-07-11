@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { ui } from '../styles/ui.js';
 
 export default function Dropzone({ onAdd }) {
   const onDrop = useCallback((accepted) => {
@@ -13,12 +14,9 @@ export default function Dropzone({ onAdd }) {
   });
 
   return (
-    <div
-      {...getRootProps()}
-      className={`border border-dashed cursor-pointer text-center py-4 text-[11px] uppercase tracking-wider text-fg-dim hover:bg-bg-2 ${isDragActive ? 'bg-bg-2 border-accent' : 'border-border'}`}
-    >
+    <div {...getRootProps()} className={`${ui.dropzone} ${isDragActive ? 'bg-bg-2 border-fg' : 'border-border'}`}>
       <input {...getInputProps()} />
-      {isDragActive ? 'Drop here' : 'Click or drag images'}
+      {isDragActive ? 'Drop here' : 'Drop images or click to upload'}
     </div>
   );
 }

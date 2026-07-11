@@ -12,7 +12,6 @@ export default {
         border: 'var(--border)',
         accent: 'var(--accent)',
         'accent-fg': 'var(--accent-fg)',
-        red: 'var(--red)',
       },
     },
   },

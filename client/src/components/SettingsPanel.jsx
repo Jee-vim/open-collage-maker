@@ -1,73 +1,62 @@
+import { ui } from '../styles/ui.js';
 import { PRESETS } from '../utils/constants.js';
 
 function LayoutIcon({ preset }) {
-  const cell = 'bg-fg border';
+  const cell = 'bg-fg';
   const empty = 'bg-border';
 
-  // Film Strip — 3 across
-  if (preset === 'film') {
-    return (
-      <div className="flex gap-px w-full h-full p-1">
+  const icons = {
+    film: (
+      <div className="flex gap-px w-full h-full p-1.5">
         <div className={`${cell} flex-1`} />
         <div className={`${cell} flex-1`} />
         <div className={`${cell} flex-1`} />
       </div>
-    );
-  }
-  // Instagram — 3-col grid, 2 rows (last row partial)
-  if (preset === 'instagram') {
-    return (
-      <div className="grid grid-cols-3 gap-px w-full h-full p-1">
+    ),
+    instagram: (
+      <div className="grid grid-cols-3 gap-px w-full h-full p-1.5">
         <div className={cell} /><div className={cell} /><div className={cell} />
         <div className={cell} /><div className={cell} /><div className={empty} />
       </div>
-    );
-  }
-  // Pinterest — masonry 2-col, uneven heights
-  if (preset === 'pinterest') {
-    return (
-      <div className="flex gap-px w-full h-full p-1">
+    ),
+    pinterest: (
+      <div className="flex gap-px w-full h-full p-1.5">
         <div className="flex flex-col gap-px flex-1">
           <div className={`${cell} flex-1`} />
-          <div className={`${cell} flex-2`} />
+          <div className={`${cell} flex-[2]`} />
         </div>
         <div className="flex flex-col gap-px flex-1">
-          <div className={`${cell} flex-2`} />
+          <div className={`${cell} flex-[2]`} />
           <div className={`${cell} flex-1`} />
         </div>
       </div>
-    );
-  }
-  // Contact Sheet — dense 3x2 tile grid
-  if (preset === 'contact') {
-    return (
-      <div className="grid grid-cols-3 gap-px w-full h-full p-1">
+    ),
+    contact: (
+      <div className="grid grid-cols-3 gap-px w-full h-full p-1.5">
         <div className={cell} /><div className={cell} /><div className={cell} />
         <div className={cell} /><div className={cell} /><div className={cell} />
       </div>
-    );
-  }
-  // Polaroid — 2 large + 1 small (stacked feel)
-  if (preset === 'polaroid') {
-    return (
-      <div className="flex gap-px w-full h-full p-1">
-        <div className={`${cell} flex-2`} />
+    ),
+    polaroid: (
+      <div className="flex gap-px w-full h-full p-1.5">
+        <div className={`${cell} flex-[2]`} />
         <div className="flex flex-col gap-px flex-1">
           <div className={`${cell} flex-1`} />
           <div className={`${empty} flex-1`} />
         </div>
       </div>
-    );
-  }
-  return null;
+    ),
+  };
+
+  return icons[preset] || null;
 }
 
-const COLOR_PRESETS = [
+const COLORS = [
   { value: '#ffffff', label: 'White' },
-  { value: '#e2e8f0', label: 'Slate 200' },
-  { value: '#94a3b8', label: 'Slate 400' },
+  { value: '#f5f5f5', label: 'Gray 100' },
+  { value: '#e5e5e5', label: 'Gray 200' },
   { value: '#000000', label: 'Black' },
-  { value: '#fef3c7', label: 'Amber' },
+  { value: '#fef3c7', label: 'Yellow' },
   { value: '#dbeafe', label: 'Blue' },
   { value: '#dcfce7', label: 'Green' },
   { value: '#fce7f3', label: 'Pink' },
@@ -78,15 +67,15 @@ export default function SettingsPanel({ settings, onChange, onPreset, presetValu
   const set = (key, val) => onChange({ ...settings, [key]: val });
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex flex-col gap-1">
-        <span className="text-fg-dim text-[11px] uppercase">Preset</span>
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2">
+        <span className={ui.sectionLabel}>Layout</span>
         <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
           {PRESETS.map((p) => (
             <button
               key={p.value}
               onClick={() => onPreset(p.value)}
-              className={`flex-shrink-0 w-28 h-24 overflow-hidden`}
+              className={`flex-shrink-0 w-24 h-20 bg-bg-2 ${ui.tile} ${presetValue === p.value ? ui.tileActive : ''}`}
               title={p.label}
             >
               <LayoutIcon preset={p.value} />
@@ -95,14 +84,14 @@ export default function SettingsPanel({ settings, onChange, onPreset, presetValu
         </div>
       </div>
 
-      <div className="flex flex-col gap-1">
-        <span className="text-fg-dim text-[11px] uppercase">Background</span>
-        <div className="flex flex-wrap gap-1">
-          {COLOR_PRESETS.map((c) => (
+      <div className="flex flex-col gap-2">
+        <span className={ui.sectionLabel}>Background</span>
+        <div className="flex gap-2">
+          {COLORS.map((c) => (
             <button
               key={c.value}
               onClick={() => set('background', c.value)}
-              className={`w-9 h-9 border hover:border-accent ${settings.background === c.value ? 'border-accent ring-1 ring-accent' : 'border-border'}`}
+              className={`min-w-8 h-8 border hover:border-fg ${settings.background === c.value ? 'border-fg' : 'border-border'}`}
               style={{ background: c.value }}
               title={c.label}
             />

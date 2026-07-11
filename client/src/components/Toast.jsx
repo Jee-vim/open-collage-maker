@@ -1,7 +1,7 @@
 export default function Toast({ toast }) {
   if (!toast) return null;
   return (
-    <div className="fixed top-14 right-3 z-50 px-3 py-1.5 text-xs border border-border bg-bg shadow-sm">
+    <div className="fixed bottom-4 right-4 z-50 px-4 py-2 text-sm border border-border bg-bg shadow-lg">
       {toast.message}
     </div>
   );

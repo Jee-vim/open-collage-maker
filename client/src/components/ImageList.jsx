@@ -10,17 +10,17 @@ function Layout({ items, layout, background, total }) {
   const box = { background, padding: `${OUTER_PADDING}px`, width: total.width || '100%', height: total.height || 'auto' };
 
   if (layout === 'horizontal') {
-    return <div style={{ ...box, ...row }}>{items.map((it) => <img key={it.id} src={it.preview} alt={it.name} style={{ width: cellOf(it).w, height: cellOf(it).h }} className="object-cover border border-border" draggable="false" />)}</div>;
+    return <div style={{ ...box, ...row }}>{items.map((it) => <img key={it.id} src={it.preview} alt={it.name} style={{ width: cellOf(it).w, height: cellOf(it).h }} className="object-cover" draggable="false" />)}</div>;
   }
   if (layout === 'vertical') {
-    return <div style={{ ...box, ...col }}>{items.map((it) => <img key={it.id} src={it.preview} alt={it.name} style={{ width: cellOf(it).w, height: cellOf(it).h }} className="object-cover border border-border" draggable="false" />)}</div>;
+    return <div style={{ ...box, ...col }}>{items.map((it) => <img key={it.id} src={it.preview} alt={it.name} style={{ width: cellOf(it).w, height: cellOf(it).h }} className="object-cover" draggable="false" />)}</div>;
   }
   if (layout === 'masonry') {
     const cols = masonryColumns(items, gridCols(items.length));
     return (
       <div style={{ ...box, ...row }}>
         {cols.map((c, i) => (
-          <div key={i} style={col}>{c.map((it) => <img key={it.id} src={it.preview} alt={it.name} style={{ width: cellOf(it).w, height: cellOf(it).h }} className="object-cover border border-border" draggable="false" />)}</div>
+          <div key={i} style={col}>{c.map((it) => <img key={it.id} src={it.preview} alt={it.name} style={{ width: cellOf(it).w, height: cellOf(it).h }} className="object-cover" draggable="false" />)}</div>
         ))}
       </div>
     );
@@ -29,7 +29,7 @@ function Layout({ items, layout, background, total }) {
     return (
       <div style={{ ...box, display: 'grid', gridTemplateColumns: 'repeat(auto-fill, 120px)', gap: `${GAP}px` }}>
         {items.map((it) => (
-          <img key={it.id} src={it.preview} alt={it.name} style={{ width: 120, height: 120 }} className="object-cover border border-border" draggable="false" />
+          <img key={it.id} src={it.preview} alt={it.name} style={{ width: 120, height: 120 }} className="object-cover" draggable="false" />
         ))}
       </div>
     );
@@ -40,7 +40,7 @@ function Layout({ items, layout, background, total }) {
     <div style={{ ...box, ...col }}>
       {rows.map((r, i) => (
         <div key={i} style={row}>
-          {r.map((it) => <img key={it.id} src={it.preview} alt={it.name} style={{ width: ss[items.indexOf(it)].w, height: ss[items.indexOf(it)].h }} className="object-cover border border-border" draggable="false" />)}
+          {r.map((it) => <img key={it.id} src={it.preview} alt={it.name} style={{ width: ss[items.indexOf(it)].w, height: ss[items.indexOf(it)].h }} className="object-cover" draggable="false" />)}
         </div>
       ))}
     </div>

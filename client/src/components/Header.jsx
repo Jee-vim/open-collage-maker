@@ -1,12 +1,10 @@
+import { ui } from '../styles/ui.js';
+
 export default function Header({ onGenerate, loading, progress, disabled }) {
   return (
-    <header className="flex items-center justify-between px-3 py-2 border-b border-border bg-bg-1">
-      <h1 className="text-xs font-bold uppercase tracking-widest">Collage Maker</h1>
-      <button
-        onClick={onGenerate}
-        disabled={disabled}
-        className="px-3 py-1 text-xs font-semibold border border-accent text-accent hover:bg-accent hover:text-accent-fg disabled:opacity-40"
-      >
+    <header className="flex items-center justify-between px-4 h-14 border-b border-border bg-bg">
+      <h1 className="text-sm font-semibold">Photo Collage</h1>
+      <button onClick={onGenerate} disabled={disabled} className={`${ui.btn} ${ui.btnPrimary}`}>
         {loading ? `${progress}%` : 'Generate'}
       </button>
     </header>
