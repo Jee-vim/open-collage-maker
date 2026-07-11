@@ -112,11 +112,11 @@ export default function App() {
           <div className={ui.section}><SettingsPanel settings={settings} onChange={setSettings} onPreset={applyPreset} presetValue={preset} /></div>
           {images.length > 0 && (
             <div className="flex-1 min-h-0">
-              <div className={`${ui.section} !pb-0 flex justify-between items-center`}>
+              <div className={`p-4 flex justify-between items-center`}>
                 <span className={ui.sectionLabel}>{images.length} Images</span>
                 <button onClick={() => setImages([])} className={ui.btnGhost}>Clear</button>
               </div>
-              <div className="overflow-y-auto">
+              <div className="px-2 overflow-y-auto">
                 <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                   <SortableContext items={images.map((i) => i.id)} strategy={rectSortingStrategy}>
                     <div className="divide-y divide-border">

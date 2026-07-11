@@ -53,14 +53,14 @@ function LayoutIcon({ preset }) {
 
 const COLORS = [
   { value: '#ffffff', label: 'White' },
-  { value: '#f5f5f5', label: 'Gray 100' },
-  { value: '#e5e5e5', label: 'Gray 200' },
+  { value: '#888888', label: 'Gray' },
+  { value: '#333333', label: 'Dark' },
   { value: '#000000', label: 'Black' },
-  { value: '#fef3c7', label: 'Yellow' },
-  { value: '#dbeafe', label: 'Blue' },
-  { value: '#dcfce7', label: 'Green' },
-  { value: '#fce7f3', label: 'Pink' },
-  { value: '#f3e8ff', label: 'Purple' },
+  { value: '#fbbf24', label: 'Yellow' },
+  { value: '#3b82f6', label: 'Blue' },
+  { value: '#22c55e', label: 'Green' },
+  { value: '#ec4899', label: 'Pink' },
+  { value: '#a855f7', label: 'Purple' },
 ];
 
 export default function SettingsPanel({ settings, onChange, onPreset, presetValue }) {
@@ -86,12 +86,12 @@ export default function SettingsPanel({ settings, onChange, onPreset, presetValu
 
       <div className="flex flex-col gap-2">
         <span className={ui.sectionLabel}>Background</span>
-        <div className="flex gap-2">
+        <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
           {COLORS.map((c) => (
             <button
               key={c.value}
               onClick={() => set('background', c.value)}
-              className={`min-w-8 h-8 border hover:border-fg ${settings.background === c.value ? 'border-fg' : 'border-border'}`}
+              className={`flex-shrink-0 w-8 h-8 border hover:border-fg ${settings.background === c.value ? 'border-fg' : 'border-border'}`}
               style={{ background: c.value }}
               title={c.label}
             />
