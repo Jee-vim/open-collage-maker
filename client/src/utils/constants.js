@@ -1,28 +1,4 @@
-// Shared option constants for the UI.
-
-export const LAYOUTS = [
-  { value: 'horizontal', label: 'Horizontal' },
-  { value: 'vertical', label: 'Vertical' },
-  { value: 'grid', label: 'Grid' },
-  { value: 'automatic-grid', label: 'Automatic Grid' },
-  { value: 'contact-sheet', label: 'Contact Sheet' },
-  { value: 'masonry', label: 'Masonry Rows' },
-];
-
-export const RESIZE_MODES = [
-  { value: 'original', label: 'Original' },
-  { value: 'equal-width', label: 'Equal Width' },
-  { value: 'equal-height', label: 'Equal Height' },
-  { value: 'square', label: 'Square Thumbnail' },
-  { value: 'fit-width', label: 'Fit Width' },
-  { value: 'fit-height', label: 'Fit Height' },
-];
-
-export const FORMATS = [
-  { value: 'jpg', label: 'JPG' },
-  { value: 'png', label: 'PNG' },
-  { value: 'webp', label: 'WEBP' },
-];
+// Shared constants for the app.
 
 export const PRESETS = [
   { value: 'instagram', label: 'Instagram Grid', opts: { layout: 'grid' } },
@@ -36,7 +12,7 @@ export const DEFAULT_SETTINGS = {
   background: '#ffffff',
 };
 
-// Hard-coded layout metrics (must match the backend in server/services/imagemagick.js).
+// Hard-coded layout metrics (must match the backend).
 export const GAP = 10;
 export const OUTER_PADDING = 20;
 

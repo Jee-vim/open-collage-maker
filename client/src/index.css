@@ -8,7 +8,7 @@
   --bg2: #504945;
   --fg: #ebdbb2;
   --fg-dim: #928374;
-  --border: #504945;
+  --border: #ebdbb2;
   --accent: #b8bb26;
   --accent-fg: #282828;
   --red: #fb4934;
@@ -16,7 +16,11 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-family: ui-monospace, monospace; font-size: 13px; }
-body { background: var(--bg); color: var(--fg); border: 1px solid var(--border); min-height: 100vh; }
+body { background-color: var(--bg); color: var(--fg); min-height: 100vh; }
+
+  *, *::before, *::after {
+    border-color: var(--border);
+  }
 
 input, select, button { font: inherit; }
 
@@ -24,24 +28,3 @@ input, select, button { font: inherit; }
 
 .hide-scrollbar::-webkit-scrollbar { display: none; }
 .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-.section {
-  border: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-}
-
-.section-header {
-  padding: 6px 10px;
-  font-weight: 600;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--fg-dim);
-  border-bottom: 1px solid var(--border);
-  background: var(--bg1);
-}
-
-.section-body {
-  padding: 8px;
-}

@@ -20,16 +20,16 @@ function SidebarItem({ item, onRemove }) {
     <div
       ref={setNodeRef}
       style={style}
-      className="group flex items-center gap-2 border border-[var(--border)] p-2"
+      className="group flex items-center gap-2 border border-border p-2"
       {...attributes}
     >
-      <span className="text-sm text-[var(--text-muted)] cursor-grab select-none" {...listeners}>⠿</span>
+      <span className="text-sm text-fg-dim cursor-grab select-none" {...listeners}>⠿</span>
       <img src={item.preview} alt={item.name} className="w-12 h-12 object-cover flex-shrink-0" draggable="false" />
       <span className="text-xs truncate flex-1">{item.name}</span>
       <button
         onPointerDown={(e) => e.stopPropagation()}
         onClick={() => onRemove(item.id)}
-        className="px-1.5 py-0.5 text-xs border border-[var(--border)] hover:bg-[var(--bg-inset)] opacity-0 group-hover:opacity-100 transition-opacity"
+        className="px-1.5 py-0.5 text-[10px] border border-border hover:bg-bg-2 opacity-0 group-hover:opacity-100 transition-opacity"
       >✕</button>
     </div>
   );
@@ -78,14 +78,13 @@ export default function App() {
   );
 
   const removeImage = (id) => setImages((prev) => prev.filter((i) => i.id !== id));
-  const reorder = (next) => setImages(next);
 
   const handleDragEnd = (event) => {
     const { active, over } = event;
     if (over && active.id !== over.id) {
       const oldIndex = images.findIndex((i) => i.id === active.id);
       const newIndex = images.findIndex((i) => i.id === over.id);
-      reorder(arrayMove(images, oldIndex, newIndex));
+      setImages(arrayMove(images, oldIndex, newIndex));
     }
   };
 
@@ -121,36 +120,27 @@ export default function App() {
 
       <div className="flex flex-1 min-h-0">
         {/* Sidebar */}
-        <aside className="w-96 flex-shrink-0 border-r border-[var(--border)] flex flex-col overflow-y-auto">
+        <aside className="w-96 flex-shrink-0 border-r border-border flex flex-col overflow-y-auto">
           {/* Upload */}
-          <div className="border-b border-[var(--border)]">
-            <div className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-muted)] bg-[var(--bg-inset)] border-b border-[var(--border)]">
-              Upload
-            </div>
-            <div className="p-2">
-              <Dropzone onAdd={addImages} />
-            </div>
+          <div className="border-b border-border">
+            <div className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-fg-dim bg-bg-1">Upload</div>
+            <div className="p-2"><Dropzone onAdd={addImages} /></div>
           </div>
 
           {/* Settings */}
-          <div className="border-b border-[var(--border)]">
-            <div className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-muted)] bg-[var(--bg-inset)] border-b border-[var(--border)]">
-              Settings
-            </div>
+          <div className="border-b border-border">
+            <div className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-fg-dim bg-bg-1">Settings</div>
             <div className="p-2">
               <SettingsPanel settings={settings} onChange={setSettings} onPreset={applyPreset} presetValue={preset} />
             </div>
           </div>
 
-          {/* Image list sidebar */}
+          {/* Image list */}
           {images.length > 0 && (
             <div className="flex-1 min-h-0">
-              <div className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-muted)] bg-[var(--bg-inset)] border-b border-[var(--border)] flex justify-between items-center">
+              <div className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-fg-dim bg-bg-1 flex justify-between items-center">
                 <span>Images ({images.length})</span>
-                <button
-                  onClick={() => setImages([])}
-                  className="px-1.5 py-0.5 text-[10px] border border-[var(--border)] hover:bg-[var(--bg2)]"
-                >Clear</button>
+                <button onClick={() => setImages([])} className="px-1.5 py-0.5 text-[10px] border border-border hover:bg-bg-2">Clear</button>
               </div>
               <div className="p-2 overflow-y-auto">
                 <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -167,18 +157,12 @@ export default function App() {
           )}
         </aside>
 
-        {/* Main preview area */}
-        <main className="flex-1 min-w-0 flex items-center justify-center p-4 overflow-auto bg-[var(--bg-inset)]">
+        {/* Main preview */}
+        <main className="flex-1 min-w-0 flex items-center justify-center p-4 overflow-auto bg-bg-2">
           {images.length > 0 ? (
-            <ImageList
-              items={images}
-              layout={settings.layout}
-              background={settings.background}
-            />
+            <ImageList items={images} layout={settings.layout} background={settings.background} />
           ) : (
-            <div className="text-[11px] text-[var(--text-muted)] uppercase tracking-wider">
-              Upload images to preview
-            </div>
+            <div className="text-[11px] text-fg-dim uppercase tracking-wider">Upload images to preview</div>
           )}
         </main>
       </div>
