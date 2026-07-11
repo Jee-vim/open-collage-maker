@@ -3,7 +3,7 @@ import Header from './components/Header.jsx';
 import Dropzone from './components/Dropzone.jsx';
 import ImageList from './components/ImageList.jsx';
 import SettingsPanel from './components/SettingsPanel.jsx';
-import ResultPanel from './components/ResultPanel.jsx';
+
 import Toast from './components/Toast.jsx';
 import { useTheme } from './hooks/useTheme.js';
 import { generateCollage } from './api/collage.js';
@@ -18,7 +18,6 @@ export default function App() {
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);
   const [progress, setProgress] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState(null);
   const [preset, setPreset] = useState('');
   const [toast, setToast] = useState(null);
 
@@ -70,15 +69,13 @@ export default function App() {
     if (images.length < 2) return notify('Upload at least 2 images', 'error');
     setLoading(true);
     setProgress(0);
-    setResult(null);
     try {
       const res = await generateCollage(
         { ...settings, images: images.map((i) => i.file), sizes: images.map((i) => i.size) },
         setProgress
       );
       if (res.success) {
-        setResult(res);
-        notify('Collage generated', 'success');
+        notify('Collage saved to output/', 'success');
       } else {
         notify(res.message || 'Generation failed', 'error');
       }
@@ -130,9 +127,7 @@ export default function App() {
           {loading && <div className="w-48 h-1 bg-slate-300 dark:bg-slate-700 rounded-full" />}
         </section>
 
-        <section>
-          <ResultPanel result={result} />
-        </section>
+
       </main>
     </div>
   );
