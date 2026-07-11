@@ -2,7 +2,7 @@ import { PRESETS } from '../utils/constants.js';
 
 // Mini visual preview for each preset layout
 function LayoutIcon({ layout }) {
-  const cell = 'bg-[var(--text)]';
+  const cell = 'bg-[var(--text)] border';
   const empty = 'bg-[var(--border)]';
 
   if (layout === 'film') {
@@ -53,18 +53,34 @@ function LayoutIcon({ layout }) {
   );
 }
 
-function ColorInput({ value, onChange }) {
+const COLOR_PRESETS = [
+  { value: '#ffffff', label: 'White' },
+  { value: '#e2e8f0', label: 'Slate 200' },
+  { value: '#94a3b8', label: 'Slate 400' },
+  { value: '#000000', label: 'Black' },
+  { value: '#fef3c7', label: 'Amber' },
+  { value: '#dbeafe', label: 'Blue' },
+  { value: '#dcfce7', label: 'Green' },
+  { value: '#fce7f3', label: 'Pink' },
+  { value: '#f3e8ff', label: 'Purple' },
+];
+
+function ColorPresets({ value, onChange }) {
   return (
-    <label className="flex items-center gap-2">
-      <span className="text-[11px] text-[var(--text-muted)] uppercase">BG</span>
-      <input
-        type="color"
-        value={value || '#ffffff'}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-5 h-5 border border-[var(--border)] p-0 cursor-pointer"
-      />
-      <span className="text-[11px] text-[var(--text-muted)]">{value}</span>
-    </label>
+    <div className="flex flex-col gap-1">
+      <span className="text-[11px] text-[var(--text-muted)] uppercase">Background</span>
+      <div className="flex flex-wrap gap-1">
+        {COLOR_PRESETS.map((c) => (
+          <button
+            key={c.value}
+            onClick={() => onChange(c.value)}
+            className={`w-9 h-9 border hover:border-[var(--accent)] ${value === c.value ? 'border-[var(--accent)] ring-1 ring-[var(--accent)]' : 'border-[var(--border)]'}`}
+            style={{ background: c.value }}
+            title={c.label}
+          />
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -73,20 +89,14 @@ export default function SettingsPanel({ settings, onChange, onPreset, presetValu
 
   return (
     <div className="flex flex-col gap-2">
-      {/* Preset selector — visual cards */}
-      <div className="flex gap-1 overflow-x-auto pb-1">
-        {/* None option */}
-        <button
-          onClick={() => onPreset('')}
-          className={`flex-shrink-0 w-16 h-12 border flex flex-col items-center justify-center text-[10px] text-[var(--text-muted)] hover:border-[var(--accent)] ${!presetValue ? 'border-[var(--accent)]' : 'border-[var(--border)]'}`}
-        >
-          <span>None</span>
-        </button>
+    <div className="flex flex-col gap-1">
+      <span className="text-[11px] text-[var(--text-muted)] uppercase">Preset</span>
+      <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
         {PRESETS.map((p) => (
           <button
             key={p.value}
             onClick={() => onPreset(p.value)}
-            className={`flex-shrink-0 w-16 h-12 border overflow-hidden hover:border-[var(--accent)] ${presetValue === p.value ? 'border-[var(--accent)]' : 'border-[var(--border)]'}`}
+            className={`flex-shrink-0 w-28 h-24 border overflow-hidden hover:border-[var(--accent)] ${presetValue === p.value ? 'border-[var(--accent)] ring-1 ring-[var(--accent)]' : 'border-[var(--border)]'}`}
             style={{ background: p.opts.background || '#fff' }}
             title={p.label}
           >
@@ -94,9 +104,10 @@ export default function SettingsPanel({ settings, onChange, onPreset, presetValu
           </button>
         ))}
       </div>
+      </div>
 
       {/* Background color */}
-      <ColorInput value={settings.background} onChange={(v) => set('background', v)} />
+      <ColorPresets value={settings.background} onChange={(v) => set('background', v)} />
     </div>
   );
 }

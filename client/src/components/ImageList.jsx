@@ -1,8 +1,5 @@
-// Reorderable preview that mirrors the collage layout exactly.
+// Static preview that mirrors the collage layout exactly.
 import { useRef, useState, useEffect } from 'react';
-import { DndContext, closestCenter } from '@dnd-kit/core';
-import { SortableContext, arrayMove, useSortable, rectSortingStrategy } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 import { GAP, OUTER_PADDING } from '../utils/constants.js';
 
 function gridCols(count) {
@@ -25,7 +22,6 @@ function cellOf(it) {
   return it.size || { w: 200, h: 200 };
 }
 
-// Stretch a partial last grid row so it fills the full row width (no blank cells).
 function stretchedSizes(items) {
   const sizes = items.map((i) => cellOf(i));
   const cols = gridCols(items.length);
@@ -63,7 +59,6 @@ function totals(items, layout) {
     const colH = cols.map((c) => c.reduce((s, it) => s + cellOf(it).h, 0) + g(c.length));
     return { width: colW.reduce((s, w) => s + w, 0) + g(cols.length) + pad, height: Math.max(...colH) + pad };
   }
-  // grid — stretched last row fills full width
   const ss = stretchedSizes(items);
   const rows = chunkRows(items, gridCols(n));
   const rowW = rows.map((r) => r.reduce((s, it) => s + ss[items.indexOf(it)].w, 0) + g(r.length));
@@ -71,73 +66,51 @@ function totals(items, layout) {
   return { width: Math.max(...rowW) + pad, height: rowH.reduce((s, h) => s + h, 0) + g(rows.length) + pad };
 }
 
-function Thumb({ item, onRemove }) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: item.id });
-  const style = { transform: CSS.Transform.toString(transform), transition };
-  const size = item.size || { w: 200, h: 200 };
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={{ ...style, width: size.w, height: size.h }}
-      className="relative flex-shrink-0 outline-none border border-[var(--border)]"
-    >
-      <img src={item.preview} alt={item.name} className="w-full h-full object-cover" />
-      <button {...attributes} {...listeners} className="absolute top-0 left-0 px-1 text-[10px] bg-[var(--bg)]/80 border-r border-b border-[var(--border)] cursor-grab" title="Drag to reorder">⠿</button>
-      <button onClick={() => onRemove(item.id)} className="absolute top-0 right-0 px-1 text-[10px] bg-[var(--bg)]/80 border-l border-b border-[var(--border)]">✕</button>
-    </div>
-  );
-}
-
-function Layout({ items, layout, background, onRemove, total }) {
+function Layout({ items, layout, background, total }) {
   const gap = { gap: `${GAP}px` };
   const row = { ...gap, display: 'flex', flexDirection: 'row', alignItems: 'flex-start' };
   const col = { ...gap, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' };
   const box = { background, padding: `${OUTER_PADDING}px`, width: total.width || '100%', height: total.height || 'auto' };
 
   if (layout === 'horizontal') {
-    return <div style={{ ...box, ...row }}>{items.map((it) => <Thumb key={it.id} item={it} onRemove={onRemove} />)}</div>;
+    return <div style={{ ...box, ...row }}>{items.map((it) => <img key={it.id} src={it.preview} alt={it.name} style={{ width: cellOf(it).w, height: cellOf(it).h }} className="object-cover border border-[var(--border)]" draggable="false" />)}</div>;
   }
   if (layout === 'vertical') {
-    return <div style={{ ...box, ...col }}>{items.map((it) => <Thumb key={it.id} item={it} onRemove={onRemove} />)}</div>;
+    return <div style={{ ...box, ...col }}>{items.map((it) => <img key={it.id} src={it.preview} alt={it.name} style={{ width: cellOf(it).w, height: cellOf(it).h }} className="object-cover border border-[var(--border)]" draggable="false" />)}</div>;
   }
   if (layout === 'masonry') {
     const cols = masonryColumns(items, gridCols(items.length));
     return (
       <div style={{ ...box, ...row }}>
         {cols.map((c, i) => (
-          <div key={i} style={col}>{c.map((it) => <Thumb key={it.id} item={it} onRemove={onRemove} />)}</div>
+          <div key={i} style={col}>{c.map((it) => <img key={it.id} src={it.preview} alt={it.name} style={{ width: cellOf(it).w, height: cellOf(it).h }} className="object-cover border border-[var(--border)]" draggable="false" />)}</div>
         ))}
       </div>
     );
   }
   if (layout === 'contact-sheet') {
     return (
-      <div style={{ ...box, display: 'grid', gridTemplateColumns: 'repeat(auto-fill, 120px)' }}>
+      <div style={{ ...box, display: 'grid', gridTemplateColumns: 'repeat(auto-fill, 120px)', gap: `${GAP}px` }}>
         {items.map((it) => (
-          <div key={it.id} style={{ width: 120, height: 120 }} className="relative flex-shrink-0 border border-[var(--border)]">
-            <img src={it.preview} alt={it.name} className="w-full h-full object-cover" />
-            <button onClick={() => onRemove(it.id)} className="absolute top-0 right-0 px-1 text-[10px] bg-[var(--bg)]/80 border-l border-b border-[var(--border)]">✕</button>
-          </div>
+          <img key={it.id} src={it.preview} alt={it.name} style={{ width: 120, height: 120 }} className="object-cover border border-[var(--border)]" draggable="false" />
         ))}
       </div>
     );
   }
-  // grid — last partial row stretched to fill full row width
   const ss = stretchedSizes(items);
   const rows = chunkRows(items, gridCols(items.length));
   return (
     <div style={{ ...box, ...col }}>
       {rows.map((r, i) => (
         <div key={i} style={row}>
-          {r.map((it) => <Thumb key={it.id} item={{ ...it, size: ss[items.indexOf(it)] }} onRemove={onRemove} />)}
+          {r.map((it) => <img key={it.id} src={it.preview} alt={it.name} style={{ width: ss[items.indexOf(it)].w, height: ss[items.indexOf(it)].h }} className="object-cover border border-[var(--border)]" draggable="false" />)}
         </div>
       ))}
     </div>
   );
 }
 
-export default function ImageList({ items, layout, background, onReorder, onRemove }) {
+export default function ImageList({ items, layout, background }) {
   const wrapRef = useRef(null);
   const [scale, setScale] = useState(1);
 
@@ -146,36 +119,24 @@ export default function ImageList({ items, layout, background, onReorder, onRemo
   useEffect(() => {
     const el = wrapRef.current;
     if (!el || total.width === 0) return;
+    const parent = el.parentElement;
     const update = () => {
-      const avail = el.clientWidth;
-      setScale(Math.min(1, avail / total.width));
+      const avail = parent ? parent.clientWidth : el.clientWidth;
+      setScale(Math.min(1, (avail - 32) / total.width));
     };
     update();
     const ro = new ResizeObserver(update);
-    ro.observe(el);
+    if (parent) ro.observe(parent);
     return () => ro.disconnect();
   }, [total.width]);
 
   if (!items.length) return null;
 
-  const handleEnd = (event) => {
-    const { active, over } = event;
-    if (over && active.id !== over.id) {
-      const oldIndex = items.findIndex((i) => i.id === active.id);
-      const newIndex = items.findIndex((i) => i.id === over.id);
-      onReorder(arrayMove(items, oldIndex, newIndex));
-    }
-  };
-
   return (
-    <div ref={wrapRef} className="w-full overflow-x-auto">
+    <div ref={wrapRef} className="inline-block">
       <div style={{ width: total.width ? total.width * scale : '100%', height: total.height ? total.height * scale : 'auto' }}>
         <div style={{ width: total.width || '100%', height: total.height || 'auto', transform: `scale(${scale})`, transformOrigin: 'top left' }}>
-          <DndContext collisionDetection={closestCenter} onDragEnd={handleEnd}>
-            <SortableContext items={items.map((i) => i.id)} strategy={rectSortingStrategy}>
-              <Layout items={items} layout={layout} background={background} onRemove={onRemove} total={total} />
-            </SortableContext>
-          </DndContext>
+          <Layout items={items} layout={layout} background={background} total={total} />
         </div>
       </div>
     </div>

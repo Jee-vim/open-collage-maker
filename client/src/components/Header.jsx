@@ -1,12 +1,13 @@
-export default function Header({ theme, onToggle }) {
+export default function Header({ onGenerate, loading, progress, disabled }) {
   return (
-    <header className="flex items-center justify-between px-3 py-2 border-b border-[var(--border)] bg-[var(--bg-inset)]">
+    <header className="flex items-center justify-between px-3 py-2 border-b border-[var(--border)]" style={{ background: 'var(--bg1)' }}>
       <h1 className="text-xs font-bold uppercase tracking-widest">Collage Maker</h1>
       <button
-        onClick={onToggle}
-        className="px-2 py-0.5 text-[11px] border border-[var(--border)] hover:bg-[var(--border)]"
+        onClick={onGenerate}
+        disabled={disabled}
+        className="px-3 py-1 text-xs font-semibold border border-[var(--accent)] text-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--accent-fg)] disabled:opacity-40"
       >
-        {theme === 'dark' ? 'LT' : 'DK'}
+        {loading ? `${progress}%` : 'Generate'}
       </button>
     </header>
   );

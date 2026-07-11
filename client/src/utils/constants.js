@@ -25,11 +25,11 @@ export const FORMATS = [
 ];
 
 export const PRESETS = [
-  { value: 'instagram', label: 'Instagram Grid', opts: { layout: 'grid', gap: 4, background: 'white', resizeMode: 'square' } },
-  { value: 'pinterest', label: 'Pinterest Style', opts: { layout: 'masonry', gap: 12, background: '#1f1f1f', resizeMode: 'fit-width' } },
-  { value: 'contact', label: 'Contact Sheet', opts: { layout: 'contact-sheet', gap: 8, background: 'black', resizeMode: 'fit-width' } },
-  { value: 'film', label: 'Film Strip', opts: { layout: 'horizontal', gap: 0, background: 'black', resizeMode: 'equal-height' } },
-  { value: 'polaroid', label: 'Polaroid Stack', opts: { layout: 'grid', gap: 16, background: 'white', resizeMode: 'square' } },
+  { value: 'instagram', label: 'Instagram Grid', opts: { layout: 'grid' } },
+  { value: 'pinterest', label: 'Pinterest Style', opts: { layout: 'masonry' } },
+  { value: 'contact', label: 'Contact Sheet', opts: { layout: 'contact-sheet' } },
+  { value: 'film', label: 'Film Strip', opts: { layout: 'horizontal' } },
+  { value: 'polaroid', label: 'Polaroid Stack', opts: { layout: 'grid' } },
 ];
 
 export const DEFAULT_SETTINGS = {

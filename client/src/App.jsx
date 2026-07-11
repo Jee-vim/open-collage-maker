@@ -1,18 +1,37 @@
 import { useState, useCallback } from 'react';
+import { DndContext, closestCenter } from '@dnd-kit/core';
+import { SortableContext, arrayMove, useSortable, rectSortingStrategy } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import Header from './components/Header.jsx';
 import Dropzone from './components/Dropzone.jsx';
 import ImageList from './components/ImageList.jsx';
 import SettingsPanel from './components/SettingsPanel.jsx';
 import Toast from './components/Toast.jsx';
-import { useTheme } from './hooks/useTheme.js';
 import { generateCollage } from './api/collage.js';
 import { DEFAULT_SETTINGS, MAX_FILES, PRESETS } from './utils/constants.js';
 
 let idSeq = 0;
 const nextId = () => `img_${Date.now()}_${idSeq++}`;
 
+function SidebarItem({ item, onRemove }) {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: item.id });
+  const style = { transform: CSS.Transform.toString(transform), transition };
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="flex items-center gap-2 border border-[var(--border)] p-2"
+      {...attributes}
+    >
+      <span className="text-sm text-[var(--text-muted)] cursor-grab select-none" {...listeners}>⠿</span>
+      <img src={item.preview} alt={item.name} className="w-12 h-12 object-cover flex-shrink-0" draggable="false" />
+      <span className="text-xs truncate flex-1">{item.name}</span>
+      <button onPointerDown={(e) => e.stopPropagation()} onClick={() => onRemove(item.id)} className="px-1.5 py-0.5 text-xs border border-[var(--border)] hover:bg-[var(--bg-inset)]">✕</button>
+    </div>
+  );
+}
+
 export default function App() {
-  const { theme, toggle } = useTheme();
   const [images, setImages] = useState([]);
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);
   const [progress, setProgress] = useState(0);
@@ -57,11 +76,20 @@ export default function App() {
   const removeImage = (id) => setImages((prev) => prev.filter((i) => i.id !== id));
   const reorder = (next) => setImages(next);
 
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = images.findIndex((i) => i.id === active.id);
+      const newIndex = images.findIndex((i) => i.id === over.id);
+      reorder(arrayMove(images, oldIndex, newIndex));
+    }
+  };
+
   const applyPreset = (value) => {
     setPreset(value);
     if (!value) return setSettings({ ...DEFAULT_SETTINGS });
     const found = PRESETS.find((p) => p.value === value);
-    if (found) setSettings({ ...DEFAULT_SETTINGS, ...found.opts });
+    if (found) setSettings((prev) => ({ ...prev, ...found.opts }));
   };
 
   const generate = async () => {
@@ -84,51 +112,68 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header theme={theme} onToggle={toggle} />
+      <Header onGenerate={generate} loading={loading} progress={progress} disabled={loading || images.length < 2} />
       <Toast toast={toast} />
 
-      <main className="flex-1 flex flex-col max-w-5xl mx-auto w-full">
-        {/* Upload */}
-        <div className="section">
-          <div className="section-header">Upload</div>
-          <div className="section-body">
-            <Dropzone onAdd={addImages} />
-          </div>
-        </div>
-
-        {/* Settings */}
-        <div className="section mt-px">
-          <div className="section-header">Settings</div>
-          <div className="section-body">
-            <SettingsPanel settings={settings} onChange={setSettings} onPreset={applyPreset} presetValue={preset} />
-          </div>
-        </div>
-
-        {/* Preview */}
-        {images.length > 0 && (
-          <div className="section mt-px">
-            <div className="section-header flex justify-between items-center">
-              <span>Preview — {images.length} images</span>
-              <button
-                onClick={generate}
-                disabled={loading || images.length < 2}
-                className="px-3 py-0.5 text-xs font-semibold border border-[var(--border)] bg-[var(--accent)] text-[var(--accent-fg)] hover:opacity-90 disabled:opacity-40"
-              >
-                {loading ? `${progress}%` : 'Generate'}
-              </button>
+      <div className="flex flex-1 min-h-0">
+        {/* Sidebar */}
+        <aside className="w-96 flex-shrink-0 border-r border-[var(--border)] flex flex-col overflow-y-auto">
+          {/* Upload */}
+          <div className="border-b border-[var(--border)]">
+            <div className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-muted)] bg-[var(--bg-inset)] border-b border-[var(--border)]">
+              Upload
             </div>
-            <div className="section-body">
-              <ImageList
-                items={images}
-                layout={settings.layout}
-                background={settings.background}
-                onReorder={reorder}
-                onRemove={removeImage}
-              />
+            <div className="p-2">
+              <Dropzone onAdd={addImages} />
             </div>
           </div>
-        )}
-      </main>
+
+          {/* Settings */}
+          <div className="border-b border-[var(--border)]">
+            <div className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-muted)] bg-[var(--bg-inset)] border-b border-[var(--border)]">
+              Settings
+            </div>
+            <div className="p-2">
+              <SettingsPanel settings={settings} onChange={setSettings} onPreset={applyPreset} presetValue={preset} />
+            </div>
+          </div>
+
+          {/* Image list sidebar */}
+          {images.length > 0 && (
+            <div className="flex-1 min-h-0">
+              <div className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-muted)] bg-[var(--bg-inset)] border-b border-[var(--border)]">
+                Images ({images.length})
+              </div>
+              <div className="p-2 overflow-y-auto">
+                <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                  <SortableContext items={images.map((i) => i.id)} strategy={rectSortingStrategy}>
+                    <div className="flex flex-col gap-1">
+                      {images.map((it) => (
+                        <SidebarItem key={it.id} item={it} onRemove={removeImage} />
+                      ))}
+                    </div>
+                  </SortableContext>
+                </DndContext>
+              </div>
+            </div>
+          )}
+        </aside>
+
+        {/* Main preview area */}
+        <main className="flex-1 min-w-0 flex items-center justify-center p-4 overflow-auto bg-[var(--bg-inset)]">
+          {images.length > 0 ? (
+            <ImageList
+              items={images}
+              layout={settings.layout}
+              background={settings.background}
+            />
+          ) : (
+            <div className="text-[11px] text-[var(--text-muted)] uppercase tracking-wider">
+              Upload images to preview
+            </div>
+          )}
+        </main>
+      </div>
     </div>
   );
 }
