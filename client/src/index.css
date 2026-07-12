@@ -55,8 +55,8 @@ input, select, button { font: inherit; }
 .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
 /* App layout */
-.sidebar { @apply w-80 flex-shrink-0 border-r flex flex-col overflow-y-auto; }
-.main { @apply flex-1 min-w-0 flex items-center justify-center p-8 overflow-hidden; }
+.sidebar { @apply bg-bg w-80 flex-shrink-0 border-r flex flex-col overflow-y-auto; }
+.main { @apply flex-1 min-w-0 flex items-center justify-center p-4 md:p-8 overflow-hidden; }
 .board-scroll { @apply w-full h-full overflow-auto flex; }
 .board-scroll > * { @apply m-auto; }
 

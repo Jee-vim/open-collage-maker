@@ -53,6 +53,7 @@ function SidebarItem({ item, onRemove }) {
 
 export default function App() {
   const [images, setImages] = useState([]);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [settings, setSettings] = useState({ ...DEFAULT_SETTINGS, ...PRESETS[0].opts });
   const [progress, setProgress] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -111,6 +112,7 @@ export default function App() {
 
   const applyPreset = (value) => {
     setPreset(value);
+    setSidebarOpen(false);
     if (!value) return setSettings({ ...DEFAULT_SETTINGS });
     const found = PRESETS.find((p) => p.value === value);
     if (found) {
@@ -157,11 +159,11 @@ export default function App() {
 
   return (
     <div className="h-screen flex flex-col overflow-hidden">
-      <Header onGenerate={generate} loading={loading} progress={progress} disabled={loading || images.length < 2} />
+      <Header onGenerate={generate} loading={loading} progress={progress} disabled={loading || images.length < 2} onMenu={() => setSidebarOpen((o) => !o)} />
       <Toast toast={toast} />
 
       <div className="flex flex-1 min-h-0">
-        <aside className="sidebar">
+        <aside className={`sidebar fixed top-14 bottom-0 left-0 z-40 w-80 -translate-x-full transition-transform md:static md:top-0 md:translate-x-0 ${sidebarOpen ? 'translate-x-0' : ''}`}>
           <div className="section"><SettingsPanel settings={settings} onChange={setSettings} onPreset={applyPreset} presetValue={preset} /></div>
           {preset && (
             <>
@@ -186,7 +188,9 @@ export default function App() {
             </>
           )}
         </aside>
-
+        {sidebarOpen && (
+          <div className="fixed top-14 left-0 right-0 bottom-0 z-30 bg-black/50 md:hidden" onClick={() => setSidebarOpen(false)} />
+        )}
         <main className="main">
           {preset ? (
             <div className="board-scroll">
