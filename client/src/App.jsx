@@ -125,11 +125,29 @@ export default function App() {
     setProgress(0);
     try {
       const res = await generateCollage(
-        { ...settings, images: images.map((i) => i.file), sizes: images.map((i) => i.size) },
+        { ...settings, preset, images: images.map((i) => i.file), sizes: images.map((i) => i.size) },
         setProgress
       );
-      if (res.success) notify('Saved to output/');
-      else notify(res.message || 'Failed');
+      if (res.success) {
+        const base = import.meta.env.VITE_API_URL || '';
+        const url = base + res.imageUrl;
+        try {
+          const blob = await (await fetch(url)).blob();
+          const obj = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = obj;
+          a.download = res.imageUrl.split('/').pop() || 'collage.png';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(obj);
+          notify('Downloading collage');
+        } catch {
+          notify('Download failed');
+        }
+      } else {
+        notify(res.message || 'Failed');
+      }
     } catch (err) {
       notify(err.response?.data?.message || 'Failed');
     } finally {

@@ -7,6 +7,7 @@ export async function generateCollage(payload, onProgress) {
   const form = new FormData();
   payload.images.forEach((file) => form.append('images[]', file));
   form.append('layout', payload.layout || 'grid');
+  form.append('preset', payload.preset || payload.layout || 'collage');
   form.append('gap', payload.gap);
   form.append('background', payload.background || '#ffffff');
   form.append('format', payload.format || 'png');

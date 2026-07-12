@@ -1,7 +1,6 @@
 // Collage generation controller. Routes stay minimal; logic lives here.
 import fs from 'fs';
 import path from 'path';
-import { randomUUID } from 'crypto';
 import config from '../config.js';
 import { generateCollage } from '../services/imagemagick.js';
 import { clampInt } from '../utils/validate.js';
@@ -32,7 +31,11 @@ export async function createCollage(req, res) {
   }
 
   const format = (req.body.format || 'png').toLowerCase();
-  const outputName = `${randomUUID()}.${format}`;
+  const pad = (n) => String(n).padStart(2, '0');
+  const d = new Date();
+  const stamp = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+  const base = (req.body.preset || req.body.layout || 'collage').replace(/[^a-z0-9-]/gi, '');
+  const outputName = `${base}-${stamp}.${format}`;
   const outputPath = path.join(config.outputDir, outputName);
 
   if (!fs.existsSync(config.outputDir)) {
