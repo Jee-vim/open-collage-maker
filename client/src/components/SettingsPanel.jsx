@@ -52,14 +52,14 @@ function LayoutIcon({ preset }) {
 
 const COLORS = [
   { value: '#ffffff', label: 'White' },
-  { value: '#888888', label: 'Gray' },
-  { value: '#333333', label: 'Dark' },
+  { value: '#fcfbfa', label: 'Alabaster' }, // Warm, soft off-white
+  { value: '#f3f4f6', label: 'Cool Gray' },  // Light gray (Tailwind gray-100)
+  { value: '#e7e5e4', label: 'Stone' },      // Warm gray (Tailwind stone-200)
+  { value: '#292524', label: 'Dark Stone' }, // Soft black/dark charcoal
   { value: '#000000', label: 'Black' },
-  { value: '#fbbf24', label: 'Yellow' },
-  { value: '#3b82f6', label: 'Blue' },
-  { value: '#22c55e', label: 'Green' },
-  { value: '#ec4899', label: 'Pink' },
-  { value: '#a855f7', label: 'Purple' },
+
+  { value: '#fef08a', label: 'Cream' },      // Soft, desaturated yellow
+  { value: '#ffedd5', label: 'Apricot' },    // Warm, muted orange/flesh tone
 ];
 
 export default function SettingsPanel({ settings, onChange, onPreset, presetValue }) {

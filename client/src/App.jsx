@@ -1,10 +1,8 @@
 import { useState, useCallback } from 'react';
-import { DndContext, closestCenter } from '@dnd-kit/core';
-import { SortableContext, arrayMove, useSortable, rectSortingStrategy } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 import Header from './components/Header.jsx';
 import Dropzone from './components/Dropzone.jsx';
 import ImageList from './components/ImageList.jsx';
+import ImageSidebar from './components/ImageSidebar.jsx';
 import SettingsPanel from './components/SettingsPanel.jsx';
 import Toast from './components/Toast.jsx';
 import { generateCollage } from './api/collage.js';
@@ -37,19 +35,6 @@ function uniformCell() {
   return { w: CELL_SIZE, h: CELL_SIZE };
 }
 
-function SidebarItem({ item, onRemove }) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: item.id });
-  const style = { transform: CSS.Transform.toString(transform), transition };
-  return (
-    <div ref={setNodeRef} style={style} className="!px-4 list-item group" {...attributes}>
-      <span className="text-fg-dim cursor-grab select-none" {...listeners}>⠿</span>
-      <div className="thumb-wrap">
-        <img src={item.preview} alt={item.name} className="thumb" draggable="false" />
-        <button onPointerDown={(e) => e.stopPropagation()} onClick={() => onRemove(item.id)} className="thumb-remove" title="Remove" type="button">✕</button>
-      </div>
-    </div>
-  );
-}
 
 export default function App() {
   const [images, setImages] = useState([]);
@@ -100,15 +85,6 @@ export default function App() {
       return next.map((it) => ({ ...it, size: cell }));
     });
   }, [slots]);
-
-  const handleDragEnd = (event) => {
-    const { active, over } = event;
-    if (over && active.id !== over.id) {
-      const oldIndex = images.findIndex((i) => i.id === active.id);
-      const newIndex = images.findIndex((i) => i.id === over.id);
-      setImages(arrayMove(images, oldIndex, newIndex));
-    }
-  };
 
   const applyPreset = (value) => {
     setPreset(value);
@@ -165,47 +141,21 @@ export default function App() {
       <div className="flex flex-1 min-h-0">
         <aside className={`sidebar fixed top-14 bottom-0 left-0 z-40 w-80 -translate-x-full transition-transform md:static md:top-0 md:translate-x-0 ${sidebarOpen ? 'translate-x-0' : ''}`}>
           <div className="section"><SettingsPanel settings={settings} onChange={setSettings} onPreset={applyPreset} presetValue={preset} /></div>
-          {preset && (
-            <>
-              <div className="section"><Dropzone onAdd={addImages} /></div>
-              {images.length > 0 && (
-                <div className="flex-1 min-h-0">
-                  <div className="section flex justify-between items-center">
-                    <span className="section-label"> Images ({images.length})</span>
-                    <button onClick={() => setImages([])} className="btn-ghost text-sm">Clear</button>
-                  </div>
-                  <div className="overflow-y-auto">
-                    <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                      <SortableContext items={images.map((i) => i.id)} strategy={rectSortingStrategy}>
-                        <div className="divide-y divide-border">
-                          {images.map((it) => <SidebarItem key={it.id} item={it} onRemove={removeImage} />)}
-                        </div>
-                      </SortableContext>
-                    </DndContext>
-                  </div>
-                </div>
-              )}
-            </>
-          )}
+          <div className="section"><Dropzone onAdd={addImages} /></div>
+          <ImageSidebar images={images} onRemove={removeImage} onClear={() => setImages([])} onReorder={setImages} />
         </aside>
         {sidebarOpen && (
           <div className="fixed top-14 left-0 right-0 bottom-0 z-30 bg-black/50 md:hidden" onClick={() => setSidebarOpen(false)} />
         )}
-        <main className="main">
-          {preset ? (
-            <div className="board-scroll">
-              <ImageList
-                items={images}
-                layout={settings.layout}
-                background={settings.background}
-                slots={slots}
-                cellSize={images.length ? uniformCell() : { w: 600, h: 600 }}
-                onAddSlot={addAt}
-              />
-            </div>
-          ) : (
-            <div className="text-sm text-fg-dim">Select a layout to begin</div>
-          )}
+        <main>
+          <ImageList
+            items={images}
+            layout={settings.layout}
+            background={settings.background}
+            slots={slots}
+            cellSize={images.length ? uniformCell() : { w: 600, h: 600 }}
+            onAddSlot={addAt}
+          />
         </main>
       </div>
     </div>

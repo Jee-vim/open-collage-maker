@@ -20,6 +20,9 @@ body { @apply bg-bg text-fg; min-height: 100vh; -webkit-font-smoothing: antialia
 
 input, select, button { font: inherit; }
 
+main { @apply flex-1 min-w-0 w-full h-full overflow-auto flex items-center justify-center p-4; }
+main > * { @apply m-auto; }
+
   *, *::before, *::after {
     border-color: var(--border);
   }
@@ -56,9 +59,6 @@ input, select, button { font: inherit; }
 
 /* App layout */
 .sidebar { @apply bg-bg w-80 flex-shrink-0 border-r flex flex-col overflow-y-auto; }
-.main { @apply flex-1 min-w-0 flex items-center justify-center p-4 md:p-8 overflow-hidden; }
-.board-scroll { @apply w-full h-full overflow-auto flex; }
-.board-scroll > * { @apply m-auto; }
 
 /* Sections */
 .section { @apply p-4 border-b }
