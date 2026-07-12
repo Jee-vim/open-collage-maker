@@ -18,7 +18,7 @@ export const DEFAULT_SETTINGS = {
 };
 
 // Hard-coded layout metrics (must match the backend).
-export const GAP = 10;
-export const OUTER_PADDING = 20;
+export const GAP = 24;
+export const OUTER_PADDING = 48;
 
 export const MAX_FILES = 20;

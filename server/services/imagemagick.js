@@ -5,8 +5,8 @@ import { balancedGrid, chunkRows, masonryColumns } from '../utils/layout.js';
 import { validateOptions } from '../utils/validate.js';
 
 const BEST_QUALITY = 100;
-const GAP = 10;            // hard-coded internal gap between images
-const OUTER_PADDING = 20;  // hard-coded outer padding around the collage
+const GAP = 24;            // hard-coded internal gap between images
+const OUTER_PADDING = 48;  // hard-coded outer padding around the collage
 
 
 const BASE = {

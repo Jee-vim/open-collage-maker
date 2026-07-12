@@ -67,9 +67,6 @@ export default function App() {
   };
 
   const removeImage = (id) => setImages((prev) => prev.filter((i) => i.id !== id));
-  const removeAt = useCallback((index) => {
-    setImages((prev) => prev.filter((_, i) => i !== index));
-  }, []);
   const addImages = useCallback(async (files) => {
     if (!slots) return;
     const room = Math.max(0, slots - images.length);
@@ -180,9 +177,8 @@ export default function App() {
                 layout={settings.layout}
                 background={settings.background}
                 slots={slots}
-                cellSize={images.length ? uniformCell(images) : { w: 600, h: 600 }}
+                cellSize={images.length ? uniformCell() : { w: 600, h: 600 }}
                 onAddSlot={addAt}
-                onRemoveSlot={removeAt}
               />
             </div>
           ) : (
