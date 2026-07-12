@@ -1,17 +1,23 @@
 # Photo Collage Maker
 
-A full-stack web app that builds photo collages using the **ImageMagick CLI** for all image processing. Node backend runs `magick` via `spawn()` with argument arrays (no shell strings). React frontend provides upload, reorder, layout settings, and result preview.
+A full-stack web app that builds photo collages with the **ImageMagick CLI**.
+The Node backend runs `magick` via `spawn()` with argument arrays (no shell
+strings). The React frontend lets you pick a layout, fill its slots with images,
+reorder them, and generates a downloadable collage.
 
 ## Prerequisites
 
 - Node.js 18+
 - ImageMagick 7 (`magick` on PATH)
 
-### Install ImageMagick
-
-- Debian/Ubuntu: `sudo apt install imagemagick`
-- macOS: `brew install imagemagick`
-- NixOS: `nix-shell -p imagemagick`
+```bash
+# Debian/Ubuntu
+sudo apt install imagemagick
+# macOS
+brew install imagemagick
+# NixOS
+nix-shell -p imagemagick
+```
 
 Verify: `magick --version`
 
@@ -21,23 +27,24 @@ Verify: `magick --version`
 .
 ├── client/   # Vite + React + Tailwind frontend
 ├── server/   # Express + Multer + ImageMagick backend
-├── .env.example
 └── README.md
 ```
 
-## Environment Variables
+## How it works
 
-Copy `.env.example` to `.env` in the project root:
+1. **Pick a layout first** — preset cards in the sidebar (Instagram grid,
+   Pinterest masonry, Contact sheet, Film strip, Polaroid stack). Each preset
+   has a fixed number of slots.
+2. Fill the slots — click a slot's `+`, or use the Dropzone / "Add images" to
+   add several at once. Reorder thumbnails in the sidebar by dragging.
+3. **Generate** — the backend renders the collage and the browser downloads
+   the result.
 
-```
-PORT=3000
-UPLOAD_DIR=uploads
-OUTPUT_DIR=output
-TEMP_DIR=temp
-MAX_UPLOAD_SIZE=10485760
-MAX_FILES=20
-MAGICK_PATH=magick
-```
+Images are placed into **uniform 1080×1080 square cells**, cover-cropped to
+fill (no blank gaps). `GAP` (24px) and `OUTER_PADDING` (48px) are fixed
+constants defined in both `client/src/utils/constants.js` and
+`server/services/imagemagick.js` — they must stay in sync so the preview
+matches the exported file.
 
 ## Development Setup
 
@@ -46,29 +53,39 @@ Backend:
 ```bash
 cd server
 npm install
-# from project root, or set env as needed
-npm run dev
+npm run dev      # http://localhost:3000
 ```
 
-Frontend (in another terminal):
+Frontend (another terminal):
 
 ```bash
 cd client
 npm install
-npm run dev
+npm run dev      # http://localhost:5173
 ```
 
-The Vite dev server proxies `/api` and `/output` to `http://localhost:3000`.
+The Vite dev server proxies `/api` and `/output` to `http://localhost:3000`,
+so local dev works with no extra config.
 
-Open `http://localhost:5173`.
+## Configuration
 
-## Production Build
+### Frontend (`client/.env`)
 
-```bash
-cd client && npm run build
-# Serve client/dist with any static host, and run the server.
-cd server && npm start
-```
+| Var           | Purpose |
+|---------------|---------|
+| `VITE_API_URL` | Backend base URL, e.g. `https://api.example.com`. Empty = same-origin (`/api`). Set this when deploying the frontend separately. |
+
+### Backend (`server/.env`, all optional)
+
+| Var           | Default |
+|---------------|---------|
+| `PORT`        | `3000` |
+| `OUTPUT_DIR`  | `output` |
+| `UPLOAD_DIR`  | `uploads` |
+| `TEMP_DIR`    | `temp` |
+| `MAGICK_PATH` | `magick` |
+
+CORS is enabled on the server, so a separately-hosted frontend can call it.
 
 ## API
 
@@ -76,50 +93,64 @@ cd server && npm start
 
 `multipart/form-data`
 
-| Field        | Type   | Notes                          |
-|--------------|--------|--------------------------------|
-| images[]     | file[] | 2-20 images (jpg/png/webp)     |
-| layout       | string | horizontal, vertical, grid, automatic-grid, contact-sheet, masonry |
-| gap          | int    | 0-100 px                       |
-| background   | string | color, e.g. `white` or `#1f1f1f` |
-| resizeMode   | string | original, equal-width, equal-height, square, fit-width, fit-height |
-| format       | string | jpg, png, webp                 |
+| Field     | Type    | Notes |
+|-----------|---------|-------|
+| images[]  | file[]  | 2–20 images |
+| layout    | string  | `grid`, `masonry`, `contact-sheet`, `horizontal`, `vertical` |
+| background| string  | color, e.g. `white` or `#1f1f1f` |
+| format    | string  | `png`, `jpg`, `webp` |
+| sizes     | JSON    | array of `{ w, h }` (client sends uniform 1080×1080) |
+| preset    | string  | used for the output filename |
+
+`gap`, padding, and `resizeMode` are fixed server constants (not overridable
+via the API): `gap = 24`, `OUTER_PADDING = 48`, `resizeMode = original`.
 
 Response:
 
 ```json
-{ "success": true, "imageUrl": "/output/abc123.jpg" }
+{ "success": true, "imageUrl": "/output/polaroid-20240712-143000.png" }
 ```
+
+The frontend fetches `imageUrl` as a blob and triggers a download (so it works
+cross-origin).
 
 ### GET /api/health
 
-Returns backend status and configured magick path.
+Returns backend status and the configured magick path.
 
-## Example Request (curl)
+## Layouts
 
-```bash
-curl -F 'images[]=@a.jpg' -F 'images[]=@b.jpg' \
-  -F 'layout=grid' -F 'gap=10' \
-  -F 'background=white' -F 'resizeMode=original' \
-  -F 'format=jpg' \
-  http://localhost:3000/api/collage
-```
+- **Grid**: rows × cols via balanced grid (`cols = ceil(sqrt(n))`); last partial
+  row is stretched to fill the width.
+- **Masonry**: round-robin column distribution.
+- **Contact sheet**: uniform thumbnails in an ImageMagick grid.
+- **Horizontal / Vertical**: single row / single column strip.
 
-## Layout Algorithms
+## Deployment
 
-- **Grid / Automatic Grid**: rows x cols computed via balanced grid (`cols = ceil(sqrt(n))`).
-- **Masonry**: round-robin column distribution, equalized heights.
-- **Contact Sheet**: ImageMagick grid of uniform thumbnails.
+- **Frontend → Vercel**: Root Directory `client`, build
+  `npm install && npm run build`, output `dist`. Set `VITE_API_URL` to the
+  backend URL in Vercel's Environment Variables.
+- **Backend → Render** (or Railway): Root Directory `server`, build
+  `npm install`, start `node app.js` (or `npm start`). Set `OUTPUT_DIR`/`PORT`
+  if needed. Ubuntu images include ImageMagick.
+
+### Local test with ngrok
+
+Expose the backend (`ngrok http 3000`), then set `VITE_API_URL` in
+`client/.env` to the ngrok URL and restart the frontend — this exercises the
+real cross-origin download flow.
 
 ## Security
 
-- Commands built as argument arrays, executed with `spawn()` (never `exec()`).
-- MIME, extension, size, and count validated at the boundary.
-- UUID filenames; upload directory traversal prevented.
-- Temporary uploads deleted after generation.
+- Commands are argument arrays executed with `spawn()` (never `exec()`).
+- MIME / extension / size / count validated at the boundary.
+- Output filenames are `<preset>-<timestamp>.<ext>` (no user input in the path).
+- Temporary uploads are deleted after generation.
 
 ## Troubleshooting
 
 - `magick: command not found` — install ImageMagick or set `MAGICK_PATH`.
-- `Generation failed` — check server logs; ensure `magick` supports the chosen format.
-- Upload rejected — verify file type/size against `.env` limits.
+- `Generation failed` — check server logs; ensure `magick` supports the format.
+- Preview doesn't match export — confirm `GAP`/`OUTER_PADDING` match in
+  `client/src/utils/constants.js` and `server/services/imagemagick.js`.
