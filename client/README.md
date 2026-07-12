@@ -1,113 +1,37 @@
-# Collage Maker 
+# Collage Maker — Client
 
-Vite + React + Tailwind CSS frontend for the Web Photo Collage Maker.
+Vite + React frontend for the Web Photo Collage Maker.
 
 ## Stack
 
-- **Vite** — build tool
-- **React 18** — UI
-- **Tailwind CSS** — utility-first styling
-- **dnd-kit** — drag-to-reorder thumbnails
-- **react-dropzone** — file upload
+- Vite + React 18
+- Tailwind CSS
+- dnd-kit — drag-to-reorder thumbnails
+- react-dropzone — file upload
+- axios — calls the backend API
 
-## Design System
+## Flow
 
-The UI uses a **compact, grid/border-based** design. No rounded corners, no heavy shadows, no decorative elements. Everything is separated by 1px borders.
+1. Pick a **layout** first (preset cards in the sidebar).
+2. Each layout shows fixed slots. Click a slot's `+` to add an image, or use the
+   Dropzone / "Add images" to fill several at once.
+3. Reorder thumbnails in the sidebar (drag handle).
+4. **Generate** renders the collage on the backend and downloads the result.
 
-### CSS Variables (index.css)
+Images are placed into uniform `CELL_SIZE` (1080×1080) square cells, cover-cropped
+to fill. `GAP` and `OUTER_PADDING` in `src/utils/constants.js` must match the
+backend so the preview matches the exported file.
 
-```css
---border:  /* section borders, dividers */
---bg:      /* page background */
---bg-inset: /* header bg, hover states */
---text:    /* primary text */
---text-muted: /* labels, hints */
---accent:  /* selected/active border, button bg */
---accent-fg: /* button text on accent bg */
-```
+## Env
 
-Dark mode toggles all variables via `.dark` class on `<html>`.
+| Var | Purpose |
+|-----|---------|
+| `VITE_API_URL` | Backend base URL (e.g. `https://api.example.com`). Empty = same-origin (`/api`). |
 
-### Layout Structure
+## Scripts
 
-```
-Header          — thin top bar, title + theme toggle
-Section         — bordered box with header label + body
-  Upload        — dashed dropzone
-  Settings      — inline controls (preset cards, background color)
-  Preview       — scaled collage preview + generate button in header
-```
-
-Every section uses the same pattern:
-```html
-<div class="section">
-  <div class="section-header">LABEL</div>
-  <div class="section-body">content</div>
-</div>
-```
-
-### Components
-
-| File | Role |
-|------|------|
-| `App.jsx` | Root — state, auto-preset, generate |
-| `Header.jsx` | Top bar — title, theme toggle |
-| `Dropzone.jsx` | File upload — react-dropzone, dashed border |
-| `SettingsPanel.jsx` | Preset visual cards + background color picker |
-| `ImageList.jsx` | Preview grid — totals, scaling, dnd-kit, thumbnails |
-| `Toast.jsx` | Bottom-right notification |
-
-### Preset Selector
-
-Horizontal scrollable row of small preview cards (16×12 each). Each card shows a mini icon of the layout pattern (colored blocks). Selected card gets accent border. Background of each card matches the preset's background color.
-
-Presets auto-select on initial image upload based on count:
-- 2-3 images → Film Strip (horizontal)
-- 4-6 → Instagram Grid (grid)
-- 7-12 → Pinterest (masonry)
-- 13+ → Contact Sheet (tiles)
-
-### Preview (ImageList)
-
-- Scales to fit container width via `ResizeObserver` + CSS `transform: scale()`
-- Matches ImageMagick output exactly (same GAP=10, OUTER_PADDING=20)
-- Grid layout stretches last partial row to fill width (no blank cells)
-- Thumbnails have bordered cells, `⠿` drag handle, `✕` remove button
-- All images use `object-cover` (200×200 default, auto-crop to fill)
-
-### Thumbnails
-
-- Bordered cells (no rounded corners)
-- Drag handle: `⠿` (top-left, bordered)
-- Remove: `✕` (top-right, bordered)
-- Image fills cell via `object-cover`
-
-## File Structure
-
-```
-src/
-  App.jsx
-  main.jsx
-  index.css
-  api/
-    collage.js          — POST to backend
-  components/
-    Header.jsx
-    Dropzone.jsx
-    SettingsPanel.jsx
-    ImageList.jsx
-    Toast.jsx
-  hooks/
-    useTheme.js         — dark/light toggle, localStorage
-  utils/
-    constants.js        — GAP, OUTER_PADDING, MAX_FILES, PRESETS
-```
-
-## Constants (constants.js)
-
-```js
-GAP = 10            // internal gap between images
-OUTER_PADDING = 20  // outer padding around collage
-MAX_FILES = 30
-PRESETS = [ ... ]   // value, label, opts (layout, background)
+```bash
+npm install
+npm run dev      # dev server
+npm run build    # production build -> dist/
 ```

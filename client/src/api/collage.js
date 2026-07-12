@@ -1,7 +1,8 @@
 // API client for the collage backend.
 import axios from 'axios';
 
-const client = axios.create({ baseURL: '/api' });
+const base = import.meta.env.VITE_API_URL || '';
+const client = axios.create({ baseURL: base ? `${base}/api` : '/api' });
 
 export async function generateCollage(payload, onProgress) {
   const form = new FormData();
