@@ -31,5 +31,8 @@ const upload = multer({
   },
 });
 
-export const uploadImages = upload.array('images[]', config.maxFiles);
+export const uploadImages = upload.fields([
+  { name: 'images[]', maxCount: config.maxFiles },
+  { name: 'backgroundImage', maxCount: 1 },
+]);
 export default upload;

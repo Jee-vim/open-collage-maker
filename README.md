@@ -93,14 +93,15 @@ CORS is enabled on the server, so a separately-hosted frontend can call it.
 
 `multipart/form-data`
 
-| Field     | Type    | Notes |
-|-----------|---------|-------|
-| images[]  | file[]  | 2–20 images |
-| layout    | string  | `grid`, `masonry`, `contact-sheet`, `horizontal`, `vertical` |
-| background| string  | color, e.g. `white` or `#1f1f1f` |
-| format    | string  | `png`, `jpg`, `webp` |
-| sizes     | JSON    | array of `{ w, h }` (client sends uniform 1080×1080) |
-| preset    | string  | used for the output filename |
+| Field        | Type    | Notes |
+|--------------|---------|-------|
+| images[]     | file[]  | 2–20 images |
+| layout       | string  | `grid`, `masonry`, `contact-sheet`, `horizontal`, `vertical` |
+| background   | string  | color, e.g. `white` or `#1f1f1f` |
+| backgroundImage | file | optional; uploaded image used as the canvas background (composited behind the collage). Supported for all layouts. |
+| format       | string  | `png`, `jpg`, `webp` |
+| sizes        | JSON    | array of `{ w, h }` (client sends uniform 1080×1080) |
+| preset       | string  | used for the output filename |
 
 `gap`, padding, and `resizeMode` are fixed server constants (not overridable
 via the API): `gap = 24`, `OUTER_PADDING = 48`, `resizeMode = original`.

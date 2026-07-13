@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import config from '../config.js';
 import { generateCollage } from '../services/imagemagick.js';
-import { clampInt } from '../utils/validate.js';
+import { clampInt, validateFile } from '../utils/validate.js';
 
 function cleanup(files) {
   files.forEach((f) => {
@@ -24,10 +24,21 @@ function parseSizes(raw) {
 }
 
 export async function createCollage(req, res) {
-  const files = req.files || [];
-  if (files.length < 2) {
-    cleanup(files);
+  const images = req.files && req.files['images[]'] ? req.files['images[]'] : [];
+  const bgImage = req.files && req.files['backgroundImage'] ? req.files['backgroundImage'][0] : null;
+  if (images.length < 2) {
+    cleanup(images.map((f) => f));
+    if (bgImage) cleanup([bgImage]);
     return res.status(400).json({ success: false, message: 'Upload 2 to 20 images' });
+  }
+
+  if (bgImage) {
+    const bgErr = validateFile(bgImage);
+    if (bgErr) {
+      cleanup(images);
+      cleanup([bgImage]);
+      return res.status(400).json({ success: false, message: bgErr });
+    }
   }
 
   const format = (req.body.format || 'png').toLowerCase();
@@ -43,7 +54,8 @@ export async function createCollage(req, res) {
   }
 
   const opts = {
-    images: files.map((f) => f.path),
+    images: images.map((f) => f.path),
+    backgroundImage: bgImage ? bgImage.path : null,
     sizes: parseSizes(req.body.sizes),
     layout: req.body.layout || 'grid',
     gap: clampInt(req.body.gap, 0, 100, 10),
@@ -55,10 +67,12 @@ export async function createCollage(req, res) {
 
   try {
     await generateCollage(opts);
-    cleanup(files);
+    cleanup(images);
+    if (bgImage) cleanup([bgImage]);
     return res.json({ success: true, imageUrl: `/output/${outputName}` });
   } catch (err) {
-    cleanup(files);
+    cleanup(images);
+    if (bgImage) cleanup([bgImage]);
     return res.status(500).json({ success: false, message: err.message || 'Generation failed' });
   }
 }

@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import Header from './components/Header.jsx';
 import Dropzone from './components/Dropzone.jsx';
 import ImageList from './components/ImageList.jsx';
@@ -44,6 +44,16 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [preset, setPreset] = useState(PRESETS[0].value);
   const [toast, setToast] = useState(null);
+  const [bgImageUrl, setBgImageUrl] = useState(null);
+
+  useEffect(() => {
+    if (settings.backgroundImage) {
+      const url = URL.createObjectURL(settings.backgroundImage);
+      setBgImageUrl(url);
+      return () => URL.revokeObjectURL(url);
+    }
+    setBgImageUrl(null);
+  }, [settings.backgroundImage]);
 
   const slots = slotsFor(preset);
 
@@ -155,6 +165,7 @@ export default function App() {
             slots={slots}
             cellSize={images.length ? uniformCell() : { w: 600, h: 600 }}
             onAddSlot={addAt}
+            backgroundImage={bgImageUrl}
           />
         </main>
       </div>

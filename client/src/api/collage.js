@@ -12,6 +12,7 @@ export async function generateCollage(payload, onProgress) {
   form.append('gap', payload.gap);
   form.append('background', payload.background || '#ffffff');
   form.append('format', payload.format || 'png');
+  if (payload.backgroundImage) form.append('backgroundImage', payload.backgroundImage);
   if (payload.sizes) form.append('sizes', JSON.stringify(payload.sizes));
 
   const res = await client.post('/collage', form, {

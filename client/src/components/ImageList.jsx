@@ -34,11 +34,17 @@ function Cell({ it, index, size, onAdd }) {
   );
 }
 
-function Layout({ cells, layout, background, total, onAdd }) {
+function Layout({ cells, layout, background, total, onAdd, backgroundImage }) {
   const gap = { gap: `${GAP}px` };
   const row = { ...gap, display: 'flex', flexDirection: 'row', alignItems: 'flex-start' };
   const col = { ...gap, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' };
   const box = { background, padding: `${OUTER_PADDING}px`, width: total.width || '100%', height: total.height || 'auto' };
+  if (backgroundImage) {
+    box.backgroundImage = `url(${backgroundImage})`;
+    box.backgroundSize = 'cover';
+    box.backgroundPosition = 'center';
+    box.backgroundRepeat = 'no-repeat';
+  }
   const sizeOf = (it, i) => cellSize(it, layout);
 
   if (layout === 'horizontal') {
@@ -93,7 +99,7 @@ function Layout({ cells, layout, background, total, onAdd }) {
   );
 }
 
-export default function ImageList({ items, layout, background, slots, cellSize, onAddSlot }) {
+export default function ImageList({ items, layout, background, slots, cellSize, onAddSlot, backgroundImage }) {
   const wrapRef = useRef(null);
   const fileRef = useRef(null);
   const [pending, setPending] = useState(null);
@@ -139,7 +145,7 @@ export default function ImageList({ items, layout, background, slots, cellSize, 
       <input ref={fileRef} type="file" accept="image/*" multiple hidden onChange={onFiles} />
       <div style={{ width: total.width ? total.width * scale : '100%', height: total.height ? total.height * scale : 'auto' }}>
           <div style={{ width: total.width || '100%', height: total.height || 'auto', transform: `scale(${scale})`, transformOrigin: 'top left' }}>
-            <Layout cells={cells} layout={layout} background={background} total={total} onAdd={openPicker} />
+            <Layout cells={cells} layout={layout} background={background} total={total} onAdd={openPicker} backgroundImage={backgroundImage} />
           </div>
         </div>
     </div>
